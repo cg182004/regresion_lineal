@@ -1,41 +1,40 @@
-import tensorflow as tf
 import pandas as pd
-import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import accuracy_score, confusion_matrix
+import os
 
-# Paso 1: Carga y Preparación de los Datos
-# df = pd.read_csv('tratamiento.csv')
+# Cambiar al directorio correcto
+os.chdir(r'C:\Users\cleve\Documents\GitHub\regresion_lineal')
 
-# otra forma de ubicar el archivo tratamiento.csv
-df = pd.read_csv(r"C:\\Users\\luisa\\OneDrive\\Documentos\\GitHub\\regresion_lineal\\tratamiento.csv")
+# Cargar datos
+df = pd.read_csv('trat.csv')
+print(df.head())
+print(df.describe())
 
-# Asumiendo que tienes una columna para predecir que podría ser algo como 'ResultadoTratamiento'
-datos_entrenamiento = df[['Tipo_cx','Tratamiento','Dieta_recomendada','ResultadoTratamiento']].values
-etiquetas_entrenamiento = df['ResultadoTratamiento'].values
+# Configurar OneHotEncoder
+ohe = OneHotEncoder(sparse=False)
 
+# Variables categóricas para codificar
+features_to_encode = ['Tipo_cx', 'Dieta_recomendada']
+df_encoded = pd.DataFrame(ohe.fit_transform(df[features_to_encode]))
+df_encoded.columns = ohe.get_feature_names_out(features_to_encode)  # Actualizado para usar get_feature_names_out
 
-# Convertimos los datos a tipos flotantes
-datos_entrenamiento = datos_entrenamiento.astype(float)
-etiquetas_entrenamiento = etiquetas_entrenamiento.astype(float)
+# Concatenar las características codificadas con las demás no categóricas (si las hay)
+df_final = pd.concat([df_encoded, df[['Tratamiento']]], axis=1)  # Mantenemos 'Tratamiento' para entrenamiento
 
-# Normalización de los datos
-media = np.mean(datos_entrenamiento, axis=0)
-desviacion_std = np.std(datos_entrenamiento, axis=0)
+# Dividir los datos en conjuntos de entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(df_final.drop(columns=['Tratamiento']), df['Tratamiento'], test_size=0.2, random_state=42)
 
-datos_entrenamiento = (datos_entrenamiento - media) / desviacion_std
+# Crear y entrenar el modelo de clasificación
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
 
-# Paso 2: Creación del Modelo
-modelo = tf.keras.Sequential([
-    tf.keras.layers.Dense(1, input_shape=(3,))
-])
+# Predecir los tratamientos en el conjunto de prueba
+y_pred = model.predict(X_test)
 
-# Configuración del modelo
-modelo.compile(optimizer='adam', loss='mae', metrics=['mae'])
-
-# Paso 3: Entrenamiento del Modelo
-modelo.fit(datos_entrenamiento, etiquetas_entrenamiento, epochs=100)
-
-# Paso 4: Evaluación del Modelo
-# Aquí deberías dividir tus datos en entrenamiento y prueba para evaluar el modelo adecuadamente
-loss, mae = modelo.evaluate(datos_entrenamiento, etiquetas_entrenamiento)
-print("Pérdida del modelo:", loss)
-print("Error absoluto medio:", mae)
+# Evaluar el modelo
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
