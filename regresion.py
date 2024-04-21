@@ -2,9 +2,6 @@ import pandas as pd
 import os
 import random
 
-# Cambiar al directorio correcto
-os.chdir(r'C:\Users\cleve\Documents\GitHub\regresion_lineal')
-
 # Cargar datos
 df = pd.read_csv('trat.csv')
 
