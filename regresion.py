@@ -3,10 +3,13 @@ import pandas as pd
 import numpy as np
 
 # Paso 1: Carga y Preparación de los Datos
-df = pd.read_csv('tratamiento.csv')
+# df = pd.read_csv('tratamiento.csv')
+
+# otra forma de ubicar el archivo tratamiento.csv
+df = pd.read_csv(r"C:\\Users\\luisa\\OneDrive\\Documentos\\GitHub\\regresion_lineal\\tratamiento.csv")
 
 # Asumiendo que tienes una columna para predecir que podría ser algo como 'ResultadoTratamiento'
-datos_entrenamiento = df[['Tipo_cx', 'Tratamiento', 'Dieta_recomendada']].values
+datos_entrenamiento = df[['Tipo_cx','Tratamiento','Dieta_recomendada','ResultadoTratamiento']].values
 etiquetas_entrenamiento = df['ResultadoTratamiento'].values
 
 
@@ -26,7 +29,7 @@ modelo = tf.keras.Sequential([
 ])
 
 # Configuración del modelo
-modelo.compile(optimizer='adam', loss='mse', metrics=['mae'])
+modelo.compile(optimizer='adam', loss='mae', metrics=['mae'])
 
 # Paso 3: Entrenamiento del Modelo
 modelo.fit(datos_entrenamiento, etiquetas_entrenamiento, epochs=100)
