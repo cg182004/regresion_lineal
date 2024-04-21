@@ -1,40 +1,32 @@
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import accuracy_score, confusion_matrix
 import os
+import random
 
 # Cambiar al directorio correcto
 os.chdir(r'C:\Users\cleve\Documents\GitHub\regresion_lineal')
 
 # Cargar datos
 df = pd.read_csv('trat.csv')
-print(df.head())
-print(df.describe())
 
-# Configurar OneHotEncoder
-ohe = OneHotEncoder(sparse=False)
+# Función para obtener un tratamiento y dieta recomendada basado en el tipo de cirugía
+def get_recommendation(tipo_cx):
+    # Filtrar el DataFrame para el tipo de cirugía especificado
+    filtered_df = df[df['Tipo_cx'] == tipo_cx]
+    
+    # Verificar si hay resultados para el tipo de cirugía
+    if len(filtered_df) == 0:
+        print("No se encontraron recomendaciones para el tipo de cirugía especificado.")
+        return
+    
+    # Seleccionar aleatoriamente uno de los tratamientos y dietas disponibles
+    random_choice = random.choice(range(len(filtered_df)))
+    tratamiento_recomendado = filtered_df.iloc[random_choice]['Tratamiento']
+    dieta_recomendada = filtered_df.iloc[random_choice]['Dieta_recomendada']
+    
+    # Imprimir la recomendación
+    print(f"Para el tipo de cirugía {tipo_cx}, se recomienda el siguiente tratamiento: {tratamiento_recomendado}")
+    print(f"Dieta recomendada: {dieta_recomendada}")
 
-# Variables categóricas para codificar
-features_to_encode = ['Tipo_cx', 'Dieta_recomendada']  # Actualizado para eliminar 'Sexo'
-df_encoded = pd.DataFrame(ohe.fit_transform(df[features_to_encode]))
-df_encoded.columns = ohe.get_feature_names_out(features_to_encode)
-
-# Concatenar las características codificadas con las demás no categóricas (si las hay)
-df_final = pd.concat([df_encoded, df[['Tratamiento']]], axis=1)
-
-# Dividir los datos en conjuntos de entrenamiento y prueba
-X_train, X_test, y_train, y_test = train_test_split(df_final.drop(columns=['Tratamiento']), df['Tratamiento'], test_size=0.2, random_state=42)
-
-# Crear y entrenar el modelo de clasificación
-model = DecisionTreeClassifier()
-model.fit(X_train, y_train)
-
-# Predecir los tratamientos en el conjunto de prueba
-y_pred = model.predict(X_test)
-
-# Evaluar el modelo
-accuracy = accuracy_score(y_test, y_pred)
-print("Accuracy:", accuracy)
-print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+# Solicitar al usuario que ingrese el tipo de cirugía
+tipo_cx_usuario = input("Ingrese el tipo de cirugía: ")
+get_recommendation(tipo_cx_usuario)
