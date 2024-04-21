@@ -17,12 +17,12 @@ print(df.describe())
 ohe = OneHotEncoder(sparse=False)
 
 # Variables categóricas para codificar
-features_to_encode = ['Tipo_cx', 'Dieta_recomendada']
+features_to_encode = ['Tipo_cx', 'Dieta_recomendada']  # Actualizado para eliminar 'Sexo'
 df_encoded = pd.DataFrame(ohe.fit_transform(df[features_to_encode]))
-df_encoded.columns = ohe.get_feature_names_out(features_to_encode)  # Actualizado para usar get_feature_names_out
+df_encoded.columns = ohe.get_feature_names_out(features_to_encode)
 
 # Concatenar las características codificadas con las demás no categóricas (si las hay)
-df_final = pd.concat([df_encoded, df[['Tratamiento']]], axis=1)  # Mantenemos 'Tratamiento' para entrenamiento
+df_final = pd.concat([df_encoded, df[['Tratamiento']]], axis=1)
 
 # Dividir los datos en conjuntos de entrenamiento y prueba
 X_train, X_test, y_train, y_test = train_test_split(df_final.drop(columns=['Tratamiento']), df['Tratamiento'], test_size=0.2, random_state=42)
