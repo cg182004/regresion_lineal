@@ -45,7 +45,7 @@ def predict_treatment_and_diet(tipo_cx):
     predicted_treatment = model_treatment.predict(input_df)
     predicted_diet = model_diet.predict(input_df)
     
-    print(f"Para el tipo de cirugía '{tipo_cx}':")
+    print(f"\n\nPara el tipo de cirugía '{tipo_cx}':")
     print(f"Tratamiento recomendado: {predicted_treatment[0]}")
     print(f"Dieta recomendada: {predicted_diet[0]}")
 
