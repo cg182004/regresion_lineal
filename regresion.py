@@ -33,9 +33,11 @@ model_diet = LogisticRegression(max_iter=1000)
 model_diet.fit(X_train, y_diet_train)
 
 def predict_treatment_and_diet(tipo_cx):
+    print(f"Debug: Tipo_cx recibido para predicción: {tipo_cx}")
     input_data = pd.DataFrame([[tipo_cx]], columns=['Tipo_cx'])
     input_encoded = encoder.transform(input_data)
     input_df = pd.DataFrame(input_encoded, columns=encoder.get_feature_names_out(['Tipo_cx']))
+    print(f"Debug: Encoded features: {input_df.head()}")
 
     predicted_treatment = model_treatment.predict(input_df)
     predicted_diet = model_diet.predict(input_df)
